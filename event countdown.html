@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Countdown Timer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .countdown-box {
+            box-shadow: 0 20px 30px -15px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .countdown-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 35px -15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .time-unit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="countdown-box w-full max-w-2xl p-8 md:p-10">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-gray-800">Event Countdown Timer</h1>
+        <p class="text-center text-gray-600 mb-8">Track your special moments with this beautiful countdown</p>
+        
+        <div class="mb-8">
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex-1">
+                    <label for="event-name" class="block text-sm font-medium text-gray-700 mb-1">Event Name</label>
+                    <input type="text" id="event-name" placeholder="e.g. My Birthday" 
+                           class="input-field w-full px-4 py-3 rounded-lg focus:outline-none">
+                </div>
+                <div class="flex-1">
+                    <label for="event-date" class="block text-sm font-medium text-gray-700 mb-1">Event Date & Time</label>
+                    <input type="datetime-local" id="event-date" 
+                           class="input-field w-full px-4 py-3 rounded-lg focus:outline-none">
+                </div>
+            </div>
+            <button id="start-btn" 
+                    class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 px-6 rounded-lg font-medium hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2">
+                <i class="fas fa-play"></i> Start Countdown
+            </button>
+        </div>
+        
+        <div id="countdown-display" class="hidden">
+            <h2 id="event-title" class="text-2xl font-bold text-center mb-6 text-gray-800"></h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-xl shadow-md text-center">
+                    <div class="text-4xl md:text-5xl font-bold time-unit" id="days">00</div>
+                    <div class="text-gray-500 mt-2">Days</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-md text-center">
+                    <div class="text-4xl md:text-5xl font-bold time-unit" id="hours">00</div>
+                    <div class="text-gray-500 mt-2">Hours</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-md text-center">
+                    <div class="text-4xl md:text-5xl font-bold time-unit" id="minutes">00</div>
+                    <div class="text-gray-500 mt-2">Minutes</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-md text-center">
+                    <div class="text-4xl md:text-5xl font-bold time-unit" id="seconds">00</div>
+                    <div class="text-gray-500 mt-2">Seconds</div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button id="reset-btn" 
+                        class="bg-gradient-to-r from-red-500 to-pink-600 text-white py-2 px-6 rounded-lg font-medium hover:from-red-600 hover:to-pink-700 transition-all duration-300 flex items-center justify-center gap-2 mx-auto">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+        </div>
+        
+        <div id="event-reached" class="hidden text-center py-8">
+            <div class="animate-pulse inline-block mb-6">
+                <i class="fas fa-calendar-check text-6xl text-purple-600"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-purple-600 mb-2" id="celebrate-title"></h2>
+            <p class="text-gray-600 mb-6">The moment you've been waiting for has arrived!</p>
+            <button id="new-event-btn" 
+                    class="bg-gradient-to-r from-green-500 to-teal-600 text-white py-2 px-6 rounded-lg font-medium hover:from-green-600 hover:to-teal-700 transition-all duration-300 flex items-center justify-center gap-2 mx-auto">
+                <i class="fas fa-plus"></i> Create New Event
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const eventNameInput = document.getElementById('event-name');
+            const eventDateInput = document.getElementById('event-date');
+            const startBtn = document.getElementById('start-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const newEventBtn = document.getElementById('new-event-btn');
+            const countdownDisplay = document.getElementById('countdown-display');
+            const eventReached = document.getElementById('event-reached');
+            
+            const daysElement = document.getElementById('days');
+            const hoursElement = document.getElementById('hours');
+            const minutesElement = document.getElementById('minutes');
+            const secondsElement = document.getElementById('seconds');
+            const eventTitle = document.getElementById('event-title');
+            const celebrateTitle = document.getElementById('celebrate-title');
+            
+            let countdownInterval;
+            
+            // Set default date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const formattedDate = tomorrow.toISOString().slice(0, 16);
+            eventDateInput.value = formattedDate;
+            
+            startBtn.addEventListener('click', startCountdown);
+            resetBtn.addEventListener('click', resetCountdown);
+            newEventBtn.addEventListener('click', resetCountdown);
+            
+            function startCountdown() {
+                const eventName = eventNameInput.value.trim();
+                const eventDate = new Date(eventDateInput.value);
+                
+                if (!eventName) {
+                    alert('Please enter an event name');
+                    return;
+                }
+                
+                if (isNaN(eventDate.getTime())) {
+                    alert('Please select a valid date and time');
+                    return;
+                }
+                
+                if (eventDate <= new Date()) {
+                    alert('Please select a future date and time');
+                    return;
+                }
+                
+                // Show countdown display
+                eventTitle.textContent = `Counting down to ${eventName}`;
+                celebrateTitle.textContent = `${eventName} is here!`;
+                countdownDisplay.classList.remove('hidden');
+                eventReached.classList.add('hidden');
+                
+                // Start the countdown
+                updateCountdown(eventDate);
+                countdownInterval = setInterval(() => updateCountdown(eventDate), 1000);
+            }
+            
+            function updateCountdown(eventDate) {
+                const now = new Date();
+                const diff = eventDate - now;
+                
+                if (diff <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownDisplay.classList.add('hidden');
+                    eventReached.classList.remove('hidden');
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                daysElement.textContent = days.toString().padStart(2, '0');
+                hoursElement.textContent = hours.toString().padStart(2, '0');
+                minutesElement.textContent = minutes.toString().padStart(2, '0');
+                secondsElement.textContent = seconds.toString().padStart(2, '0');
+            }
+            
+            function resetCountdown() {
+                clearInterval(countdownInterval);
+                countdownDisplay.classList.add('hidden');
+                eventReached.classList.add('hidden');
+                
+                // Reset inputs
+                eventNameInput.value = '';
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const formattedDate = tomorrow.toISOString().slice(0, 16);
+                eventDateInput.value = formattedDate;
+                
+                // Reset display
+                daysElement.textContent = '00';
+                hoursElement.textContent = '00';
+                minutesElement.textContent = '00';
+                secondsElement.textContent = '00';
+            }
+        });
+    </script>
+</body>
+</html>
