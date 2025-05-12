@@ -1,5 +1,5 @@
 ⏳ EVENT COUNTDOWN TIMER
-By Chrisnigel
+By CHRISNIGEL
 A sleek and simple countdown timer built with HTML, CSS, and JavaScript to track time remaining until a special event. Whether it's a product launch, birthday, or New Year’s Eve—this timer has you covered.
 
 
